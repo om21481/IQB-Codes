@@ -4,7 +4,7 @@
 using namespace std;
 
 int match = 2;
-int mis_match = -1;
+int mis_match = -3;
 int gaps = -1;
 
 void global_align(vector< vector< int > > &data, int rows, int cols){
@@ -37,19 +37,20 @@ void make_best_possible_path(vector< vector< int > > &data, int rows, int cols, 
         right = data[row][col-1] + gaps;            // for gaps
     }
 
-    int max_value = max(diagonal, max(right, down));
-    if(max_value == diagonal){
-        // diagonal is greatest
-        data[row][col] = diagonal;
-    }
-    else if(max_value == right){
-        // right is greatest
-        data[row][col] = right;
-    }
-    else if(max_value == down){
-        // down is greatest
-        data[row][col] = down;
-    }
+    // int max_value = max(diagonal, max(right, down));
+    // if(max_value == diagonal){
+    //     // diagonal is greatest
+    //     data[row][col] = diagonal;
+    // }
+    // else if(max_value == right){
+    //     // right is greatest
+    //     data[row][col] = right;
+    // }
+    // else if(max_value == down){
+    //     // down is greatest
+    //     data[row][col] = down;
+    // }
+    data[row][col] = max(diagonal, max(right, down));
 }
 void make_full_allignment(vector< vector< int > > &data, int rows, int cols, string source, string s){
     for(int i=1;i<rows;i++){

@@ -1,20 +1,20 @@
 # Here we can use any gap penalties that we want
-match = 2
-mis_match = -3
-gaps = -1
+match = 10
+mis_match = -5
+gaps = -7
 
 # this is for preprocessing of array -- here we are assigning gap penalties in the 2D array 
-# For global alignment we would fill first row and first col with increasing gap penalties
-def global_align(data, rows, cols):
+# For local alignment we would fill first row and first col with increasing gap penalties
+def local_align(data, rows, cols):
     data[0][0] = 0
     
     # for 1st row 
     for i in range(1, cols):
-        data[0][i] = i*gaps
+        data[0][i] = 0              # Here will be changes
 
     # for 1st col 
     for i in range(1, rows):
-        data[i][0] = i*gaps
+        data[i][0] = 0              # Here will be changes
 
 def make_best_possible_path(data, rows, cols, source, s, row, col):
     # Here we are doing col-1 because col and row starting from 1 and to get the character we would have to make it to 0
@@ -36,12 +36,26 @@ def make_best_possible_path(data, rows, cols, source, s, row, col):
         right = data[row][col-1] + gaps
 
     data[row][col] = max(diagonal, right, down)
+    if(data[row][col] < 0):
+        data[row][col] = 0
 
 # for calculating the whole matrix
 def make_full_allignment(data, rows, cols, source, s):
     for i in range(1, rows):
         for j in range(1, cols):
             make_best_possible_path(data, rows, cols, source, s, i, j)
+
+def find_max_value(data, rows, cols, row, col):
+    max_value = -1
+    for i in range(rows):
+        for j in range(cols):
+            if(max_value < data[i][j]):
+                max_value = data[i][j]
+                row = i
+                col = j
+    
+    return [row, col]
+            
 
 # This is the backtracking of the solution from row and col
 def backtrack_solution(data, source, s, row, col):
@@ -78,7 +92,15 @@ def backtrack_solution(data, source, s, row, col):
     left = data[row][col-1]
     up = data[row-1][col]
     value = data[row][col]
-    
+
+    # When first 0 is encountered we stop......
+    if(value == 0):
+        # p = (temp_source, temp_s)
+        # ans.append(p)
+        # return
+        p = ("", "")
+        dp[row][col].append(p)
+        return
 
     # four calls are made for bactracking the solution
     # 1. it is for match 
@@ -146,26 +168,31 @@ rows = len(s) + 1
 cols = len(source) + 1
 
 # Initializing the 2D array
-data = [[0 for j in range(cols)] for i in range(rows)]
+data = [[0 for j in range(len(source) + 1)] for i in range(len(s) + 1)]
 dp = [[[] for j in range(cols)] for i in range(rows)]
 
-# This is for Global Alignment Only
-global_align(data, rows, cols)
+# This is for local Alignment Only
+local_align(data, len(s) + 1, len(source) + 1)
 
-make_full_allignment(data, rows, cols, source, s)
+make_full_allignment(data, len(s) + 1, len(source) + 1, source, s)
 
-# main code
-backtrack_solution(data, source, s, rows-1, cols-1)
+# finding the maximum value in whole matrix
+row = -1
+col = -1
+[row, col] = find_max_value(data, len(s) + 1, len(source) + 1, row, col);
 
+#min code
+backtrack_solution(data, source, s, row, col)
 
 print()
 print_data(data, rows, cols)
 
-print("There are ", len(dp[rows-1][cols-1]), " combinations")
+print("There are ", len(dp[row][col]), " combinations")
 
-for i in range(len(dp[rows-1][cols-1])):
-    print(dp[rows-1][cols-1][i][0][::-1])
-    print(dp[rows-1][cols-1][i][1][::-1])
+for i in range(len(dp[row][col])):
+    print(dp[row][col][i][0][::-1])
+    print(dp[row][col][i][1][::-1])
     print()
 
-# Here we start from last row and last col in the matrix i.e  (rows-1, cols-1)
+
+# Here we start from max_value in the matrix i.e  (row, col)

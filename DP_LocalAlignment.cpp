@@ -5,7 +5,7 @@ using namespace std;
 
 int match = 2;
 int mis_match = -1;
-int gaps = -1;
+int gaps = -2;
 
 void local_align(vector< vector< int > > &data, int rows, int cols){
     data[0][0] = 0;
